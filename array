@@ -1,0 +1,51 @@
+@@ -0,0 +1,18 @@
+{
+  "problemMatcher": [
+    {
+      "owner": "eslint-compact",
+      "pattern": [
+        {
+          "regexp": "^(.+):\\sline\\s(\\d+),\\scol\\s(\\d+),\\s(Error|Warning|Info)\\s-\\s(.+)\\s\\((.+)\\)$",
+          "file": 1,
+          "line": 2,
+          "column": 3,
+          "severity": 4,
+          "message": 5,
+          "code": 6
+        }
+      ]
+    }
+  ]
+}
+ 30  .github/workflows/node.js.yml 
+@@ -0,0 +1,30 @@
+# https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+
+name: Node.js CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [12.x]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    - run: yarn --frozen-lockfile
+    - run: |
+        echo ::add-matcher::.github/eslint.json
+        yarn run eslint src --format=compact
+    - run: yarn test
